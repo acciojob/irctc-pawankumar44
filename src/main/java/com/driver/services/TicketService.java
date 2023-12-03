@@ -48,10 +48,18 @@ public class TicketService {
         String bookFromStation = bookTicketEntryDto.getFromStation().name();
         String bookToStation = bookTicketEntryDto.getToStation().name();
         String[] routes = train.getRoute().split(",");
+        int fromIdx = 0, toIdx = 0;
         boolean onRouteFrom = false, onRouteTo = false;
-        for(String route : routes){
-            if(route.equals(bookFromStation)) onRouteFrom = true;
-            if (route.equals(bookToStation)) onRouteTo = true;
+        for(int i = 0; i<routes.length;++i){
+            String route = routes[i];
+            if(route.equals(bookFromStation)){
+                onRouteFrom = true;
+                fromIdx = i;
+            }
+            if (route.equals(bookToStation)) {
+                onRouteTo = true;
+                toIdx = i;
+            }
         }
         if(!onRouteFrom || !onRouteTo) {
             throw new Exception("Invalid stations");
@@ -69,7 +77,29 @@ public class TicketService {
             throw new Exception("Less tickets are available");
         }
 
-       return null;
+        //calculate the fair
+        int fair = Math.abs(toIdx-fromIdx) * 300;
+
+        Ticket ticket = new Ticket();
+        ticket.setFromStation(bookTicketEntryDto.getFromStation());
+        ticket.setToStation(bookTicketEntryDto.getToStation());
+        ticket.setTrain(train);
+        ticket.setTotalFare(fair);
+        ticket = ticketRepository.save(ticket);
+
+        //update the train
+        tickets.add(ticket);
+        train.setBookedTickets(tickets);
+        trainRepository.save(train);
+
+        //update the passenger
+        Passenger passenger = passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
+        List<Ticket> passengerBookedTickets = passenger.getBookedTickets();
+        passengerBookedTickets.add(ticket);
+        passenger.setBookedTickets(passengerBookedTickets);
+        passengerRepository.save(passenger);
+
+       return ticket.getTicketId();
 
     }
 }
