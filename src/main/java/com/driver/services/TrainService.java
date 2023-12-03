@@ -81,7 +81,7 @@ public class TrainService {
                 if(bookedFrom.equals(curRoute) || bookedTo.equals(curRoute)) bookedSeats++;
             }
         }
-       return totalSeats-bookedSeats;
+       return totalSeats-bookedSeats-1;
     }
 
     public Integer calculatePeopleBoardingAtAStation(Integer trainId,Station station) throws Exception{
