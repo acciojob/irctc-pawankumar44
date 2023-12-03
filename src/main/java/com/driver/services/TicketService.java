@@ -69,22 +69,23 @@ public class TicketService {
         }
 
         //check whether the tickets available or not
-//        int bookedSeats = 0;
-//        int totalSeatInTrain = train.getNoOfSeats();
+        int bookedSeats = 0;
+        int totalSeatInTrain = train.getNoOfSeats();
         List<Ticket> tickets = train.getBookedTickets();
-//        for(Ticket ticket : tickets){
-//            bookedSeats+=ticket.getPassengersList().size();
-//        }
-//        int availSeats = totalSeatInTrain-bookedSeats;
-//        if(availSeats<bookTicketEntryDto.getNoOfSeats()){
-//            throw new Exception("Less tickets are available");
-//        }
-        int availSeats = trainService.calculateAvailableSeats(
-                new SeatAvailabilityEntryDto(train.getTrainId(),bookTicketEntryDto.getFromStation(),
-                        bookTicketEntryDto.getToStation()));
-        if(availSeats<1){
+        for(Ticket ticket : tickets){
+            bookedSeats+=ticket.getPassengersList().size();
+        }
+        int availSeats = totalSeatInTrain-bookedSeats;
+        if(availSeats<bookTicketEntryDto.getNoOfSeats()){
             throw new Exception("Less tickets are available");
         }
+
+//        int availSeats = trainService.calculateAvailableSeats(
+//                new SeatAvailabilityEntryDto(train.getTrainId(),bookTicketEntryDto.getFromStation(),
+//                        bookTicketEntryDto.getToStation()));
+//        if(availSeats<1){
+//            throw new Exception("Less tickets are available");
+//        }
 
         //calculate the fair
         int fair = Math.abs(toIdx-fromIdx) *300;
