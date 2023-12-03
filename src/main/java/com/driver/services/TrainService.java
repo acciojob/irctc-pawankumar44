@@ -78,10 +78,10 @@ public class TrainService {
             String bookedTo = ticket.getToStation().name();
             for(int i = fromIdx; i<=toIdx; ++i){
                 String curRoute = routes[i];
-                if(bookedFrom.equals(curRoute) || bookedTo.equals(curRoute)) bookedSeats++;
+                if(bookedFrom.equals(curRoute)) bookedSeats++;
             }
         }
-       return totalSeats-bookedSeats-1;
+       return totalSeats-bookedSeats;
     }
 
     public Integer calculatePeopleBoardingAtAStation(Integer trainId,Station station) throws Exception{
