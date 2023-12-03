@@ -93,11 +93,11 @@ public class TicketService {
         trainRepository.save(train);
 
         //update the passenger
-        Passenger passenger = passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
-        List<Ticket> passengerBookedTickets = passenger.getBookedTickets();
-        passengerBookedTickets.add(ticket);
-        passenger.setBookedTickets(passengerBookedTickets);
-        passengerRepository.save(passenger);
+//        Passenger passenger = passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
+//        List<Ticket> passengerBookedTickets = passenger.getBookedTickets();
+//        passengerBookedTickets.add(ticket);
+//        passenger.setBookedTickets(passengerBookedTickets);
+//        passengerRepository.save(passenger);
 
        return ticket.getTicketId();
 
