@@ -2,6 +2,7 @@ package com.driver.services;
 
 
 import com.driver.EntryDto.BookTicketEntryDto;
+import com.driver.EntryDto.SeatAvailabilityEntryDto;
 import com.driver.model.Passenger;
 import com.driver.model.Ticket;
 import com.driver.model.Train;
@@ -25,6 +26,8 @@ public class TicketService {
 
     @Autowired
     PassengerRepository passengerRepository;
+
+    TrainService trainService = new TrainService();
 
 
     public Integer bookTicket(BookTicketEntryDto bookTicketEntryDto)throws Exception{
@@ -66,25 +69,37 @@ public class TicketService {
         }
 
         //check whether the tickets available or not
-        int bookedSeats = 0;
-        int totalSeatInTrain = train.getNoOfSeats();
+//        int bookedSeats = 0;
+//        int totalSeatInTrain = train.getNoOfSeats();
         List<Ticket> tickets = train.getBookedTickets();
-        for(Ticket ticket : tickets){
-            bookedSeats+=ticket.getPassengersList().size();
-        }
-        int availSeats = totalSeatInTrain-bookedSeats;
-        if(availSeats<bookTicketEntryDto.getNoOfSeats()){
+//        for(Ticket ticket : tickets){
+//            bookedSeats+=ticket.getPassengersList().size();
+//        }
+//        int availSeats = totalSeatInTrain-bookedSeats;
+//        if(availSeats<bookTicketEntryDto.getNoOfSeats()){
+//            throw new Exception("Less tickets are available");
+//        }
+        int availSeats = trainService.calculateAvailableSeats(
+                new SeatAvailabilityEntryDto(train.getTrainId(),bookTicketEntryDto.getFromStation(),
+                        bookTicketEntryDto.getToStation()));
+        if(availSeats<1){
             throw new Exception("Less tickets are available");
         }
 
         //calculate the fair
-        int fair = Math.abs(toIdx-fromIdx) * 300;
+        int fair = Math.abs(toIdx-fromIdx) *300;
 
         Ticket ticket = new Ticket();
         ticket.setFromStation(bookTicketEntryDto.getFromStation());
         ticket.setToStation(bookTicketEntryDto.getToStation());
         ticket.setTrain(train);
         ticket.setTotalFare(fair);
+        List<Passenger> passengers = new ArrayList<>();
+        for(int pasIds : bookTicketEntryDto.getPassengerIds()){
+            Passenger passenger = passengerRepository.findById(pasIds).get();
+            passengers.add(passenger);
+        }
+        ticket.setPassengersList(passengers);
         ticket = ticketRepository.save(ticket);
 
         //update the train
